@@ -1,22 +1,23 @@
 "use client";
 
-import { Todo } from "../models/types";
+import { Task } from "../models/Task";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 const LOCAL_STORAGE_KEY = "todos";
 
 type TodoContextType = {
-  todos: Todo[];
+  todos: Task[];
   addTodo: (task: string) => void;
   toggleTodo: (id: number) => void;
   deleteTodo: (id: number) => void;
   deleteAllTodos: () => void;
+  reorderTodos: (newOrder: Task[]) => void;
 };
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Task[]>([]);
   useEffect(() => {
     const storedTodos = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedTodos) {
@@ -29,7 +30,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
   }, [todos]);
 
   const addTodo = (task: string) => {
-    setTodos((prev) => [...prev, { id: Date.now(), task, completed: false }]);
+    setTodos((prev) => [{ id: Date.now(), task, completed: false }, ...prev]);
   };
 
   const toggleTodo = (id: number) => {
@@ -44,7 +45,13 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     setTodos([]);
   };
 
-  return <TodoContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, deleteAllTodos }}>{children}</TodoContext.Provider>;
+  const reorderTodos = (newOrder: Task[]) => {
+    setTodos(newOrder);
+  };
+
+  return (
+    <TodoContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, deleteAllTodos, reorderTodos }}>{children}</TodoContext.Provider>
+  );
 };
 
 export const useTodoContext = (): TodoContextType => {

@@ -1,5 +1,6 @@
-export type Todo = {
+export type Task = {
   id: number;
   task: string;
   completed: boolean;
+  order?: number;
 };

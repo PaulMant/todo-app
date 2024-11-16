@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { Input } from "./input";
 
 interface SearchInputProps {
   onSearch: (searchTerm: string) => void;
@@ -18,7 +19,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ onSearch }) => {
 
   return (
     <div className="relative">
-      <input
+      <Input
         type="text"
         placeholder="Find a task"
         value={search}

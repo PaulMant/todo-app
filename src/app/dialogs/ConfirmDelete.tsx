@@ -27,18 +27,20 @@ export function ConfirmDeleteDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{buttonText}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[90vw] max-w-md">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle className="text-center">{title}</DialogTitle>
+          <DialogDescription className="text-center">{description}</DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="w-full sm:w-auto">
+              Cancel
+            </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button onClick={onDelete} type="submit" variant="destructive">
-              Confirm
+            <Button onClick={onDelete} type="submit" variant="destructive" className="w-full sm:w-auto">
+              Delete
             </Button>
           </DialogClose>
         </DialogFooter>

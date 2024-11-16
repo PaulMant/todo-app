@@ -38,7 +38,7 @@ const CreateTodoForm: React.FC = () => {
           <Plus className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         </div>
 
-        <Button type="submit" variant="default">
+        <Button type="submit" variant="outline" className="bg-white text-seedext border-seedext">
           Add Task
         </Button>
       </form>
