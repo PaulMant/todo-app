@@ -71,6 +71,7 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
         await todoService.deleteTodo(id);
       }
       setTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
+      setOrderedTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
       setSelectedTodos(new Set());
       toast.success(`${idsToDelete.length} tasks deleted successfully!`, {
         position: "bottom-right",
