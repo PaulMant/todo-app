@@ -5,9 +5,10 @@ import DeleteAllButton from "./DeleteAllButton";
 interface BatchActionsProps {
   selectedTodosCount: number;
   onBatchDelete: () => void;
+  onDeleteAll: () => void;
 }
 
-const BatchActions: React.FC<BatchActionsProps> = ({ selectedTodosCount, onBatchDelete }) => {
+const BatchActions: React.FC<BatchActionsProps> = ({ selectedTodosCount, onBatchDelete, onDeleteAll }) => {
   return (
     <div className="flex justify-end gap-2 mb-4">
       {selectedTodosCount > 0 && (
@@ -22,7 +23,7 @@ const BatchActions: React.FC<BatchActionsProps> = ({ selectedTodosCount, onBatch
           onDelete={onBatchDelete}
         />
       )}
-      <DeleteAllButton />
+      <DeleteAllButton onDeleteAll={onDeleteAll} />
     </div>
   );
 };

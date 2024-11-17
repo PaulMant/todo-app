@@ -20,11 +20,12 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
   const [orderedTodos, setOrderedTodos] = useState<Task[]>([]);
 
   useEffect(() => {
-    todoService.getTodos().then((fetchedTodos) => {
+    const updateTodos = (fetchedTodos: Task[]) => {
       setTodos(fetchedTodos);
-      setOrderedTodos(fetchedTodos);
-    });
-    const unsubscribe = todoService.subscribe(setTodos);
+    };
+
+    todoService.getTodos().then(updateTodos);
+    const unsubscribe = todoService.subscribe(updateTodos);
 
     return () => unsubscribe();
   }, [todoService]);
@@ -48,12 +49,12 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
     setTimeout(async () => {
       const updatedTodo = await todoService.updateTodo(id, { completed: !todos.find((todo) => todo.id === id)?.completed });
       setTodos((prev) => prev.map((todo) => (todo.id === id ? updatedTodo : todo)));
+      setOrderedTodos((prev) => prev.map((todo) => (todo.id === id ? updatedTodo : todo)));
       setAnimatingTodos((prev) => ({ ...prev, [id]: false }));
     }, 300);
   };
 
   const handleSelect = (id: number, checked: boolean) => {
-    console.log(id, checked);
     setSelectedTodos((prev) => {
       const updated = new Set(prev);
       if (checked) {
@@ -91,6 +92,13 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    await todoService.deleteAllTodos();
+    setTodos([]);
+    setOrderedTodos([]);
+    setSelectedTodos(new Set());
+  };
+
   const handleReorder = async (newOrder: Task[]) => {
     setOrderedTodos(newOrder);
     await Promise.all(newOrder.map((todo, index) => todoService.updateTodo(todo.id, { order: index })));
@@ -107,7 +115,7 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
 
   return (
     <div>
-      <BatchActions selectedTodosCount={selectedTodos.size} onBatchDelete={handleBatchDelete} />
+      <BatchActions selectedTodosCount={selectedTodos.size} onBatchDelete={handleBatchDelete} onDeleteAll={handleDeleteAll} />
       <DragAndDropList
         todos={orderedTodos}
         filteredTodos={filteredTodos}

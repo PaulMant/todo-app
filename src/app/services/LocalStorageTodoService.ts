@@ -36,7 +36,6 @@ export class LocalStorageTodoService implements TodoService {
 
   async addTodo(task: string): Promise<Task> {
     const todos = await this.getTodos();
-
     const newTodo: Task = { id: Date.now(), task, completed: false };
     todos.unshift(newTodo);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(todos));
@@ -53,7 +52,7 @@ export class LocalStorageTodoService implements TodoService {
   }
 
   async deleteAllTodos(): Promise<void> {
-    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
     await this.notifySubscribers();
   }
 

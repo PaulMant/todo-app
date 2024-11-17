@@ -4,8 +4,17 @@ import { ConfirmDeleteDialog } from "../../../app/dialogs/ConfirmDelete";
 import { useTodoService } from "../../context/TodoContext";
 import { Button } from "../ui/button";
 
-const DeleteAllButton: React.FC = () => {
-  const { deleteAllTodos } = useTodoService();
+interface DeleteAllButtonProps {
+  onDeleteAll: () => void;
+}
+
+const DeleteAllButton: React.FC<DeleteAllButtonProps> = ({ onDeleteAll }) => {
+  const todoService = useTodoService();
+
+  const handleDeleteAll = async () => {
+    await todoService.deleteAllTodos();
+    onDeleteAll();
+  };
 
   return (
     <ConfirmDeleteDialog
@@ -14,7 +23,7 @@ const DeleteAllButton: React.FC = () => {
           <span className="text-destructive">Delete all</span>
         </Button>
       }
-      onDelete={() => deleteAllTodos()}
+      onDelete={handleDeleteAll}
       title="Delete all tasks?"
       description="This action will permanently delete all your tasks."
     />
