@@ -4,7 +4,7 @@ import { AlignJustify, CircleCheckBig, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { ConfirmDeleteDialog } from "../../../app/dialogs/ConfirmDelete";
-import { useTodoContext } from "../../context/TodoContext";
+import { useTodoService } from "../../context/TodoContext";
 import { Task } from "../../models/Task";
 import { Button } from "../ui/button";
 
@@ -14,13 +14,13 @@ interface TodoItemProps {
 }
 
 export default function TodoItem({ todo, onToggle }: TodoItemProps) {
-  const { deleteTodo } = useTodoContext();
+  const todoService = useTodoService();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
     setIsDeleting(true);
     setTimeout(() => {
-      deleteTodo(todo.id);
+      todoService.deleteTodo(todo.id);
       toast.success("Task deleted successfully!", {
         position: "bottom-right",
         autoClose: 2800,

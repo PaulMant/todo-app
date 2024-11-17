@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useTodoContext } from "../../context/TodoContext";
+import { useTodoService } from "../../context/TodoContext";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Form } from "../ui/form";
@@ -14,7 +14,7 @@ const taskSchema = z.object({
 });
 
 const CreateTodoForm: React.FC = () => {
-  const { addTodo } = useTodoContext();
+  const todoService = useTodoService();
 
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
@@ -23,9 +23,9 @@ const CreateTodoForm: React.FC = () => {
     },
   });
 
-  const handleAdd = (data: z.infer<typeof taskSchema>) => {
+  const handleAdd = async (data: z.infer<typeof taskSchema>) => {
     if (data.task.trim()) {
-      addTodo(data.task);
+      await todoService.addTodo(data.task);
       form.reset();
     }
   };

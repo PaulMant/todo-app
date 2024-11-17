@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { TodoProvider } from "./context/TodoContext";
+import { TodoServiceProvider } from "./context/TodoContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Cool Todo App",
-  description: "Cool Todo App",
+  title: "Swift Task Manager",
+  description: "Swift Task Manager",
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <TodoProvider>{children}</TodoProvider>
+        <TodoServiceProvider>{children}</TodoServiceProvider>
       </body>
     </html>
   );

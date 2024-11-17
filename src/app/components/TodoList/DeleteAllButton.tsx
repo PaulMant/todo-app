@@ -1,11 +1,11 @@
 "use client";
 
 import { ConfirmDeleteDialog } from "../../../app/dialogs/ConfirmDelete";
-import { useTodoContext } from "../../context/TodoContext";
+import { useTodoService } from "../../context/TodoContext";
 import { Button } from "../ui/button";
 
 const DeleteAllButton: React.FC = () => {
-  const { deleteAllTodos } = useTodoContext();
+  const { deleteAllTodos } = useTodoService();
 
   return (
     <ConfirmDeleteDialog
@@ -14,7 +14,7 @@ const DeleteAllButton: React.FC = () => {
           <span className="text-destructive">Delete all</span>
         </Button>
       }
-      onDelete={deleteAllTodos}
+      onDelete={() => deleteAllTodos()}
       title="Delete all tasks?"
       description="This action will permanently delete all your tasks."
     />

@@ -1,21 +1,30 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useTodoContext } from "../../context/TodoContext";
 import BatchActions from "./BatchActions";
 import EmptyState from "../EmptyState";
 import DragAndDropList from "../DragAndDropList";
 import { Task } from "../../models/Task";
+import { useTodoService } from "../../context/TodoContext";
 
 interface TodoListProps {
   search: string;
 }
 
 const TodoList: React.FC<TodoListProps> = ({ search }) => {
-  const { todos, toggleTodo, deleteTodo, reorderTodos } = useTodoContext();
+  const todoService = useTodoService();
+
+  const [todos, setTodos] = useState<Task[]>([]);
   const [selectedTodos, setSelectedTodos] = useState<Set<number>>(new Set());
   const [animatingTodos, setAnimatingTodos] = useState<{ [id: number]: boolean }>({});
-  const [orderedTodos, setOrderedTodos] = useState(todos);
+  const [orderedTodos, setOrderedTodos] = useState<Task[]>([]);
+
+  useEffect(() => {
+    todoService.getTodos().then(setTodos);
+    const unsubscribe = todoService.subscribe(setTodos);
+
+    return () => unsubscribe();
+  }, [todoService]);
 
   useEffect(() => {
     setOrderedTodos(todos);
@@ -28,10 +37,11 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
       return a.completed ? 1 : -1;
     });
 
-  const handleToggle = (id: number) => {
+  const handleToggle = async (id: number) => {
     setAnimatingTodos((prev) => ({ ...prev, [id]: true }));
-    setTimeout(() => {
-      toggleTodo(id);
+    setTimeout(async () => {
+      const updatedTodo = await todoService.updateTodo(id, { completed: !todos.find((todo) => todo.id === id)?.completed });
+      setTodos((prev) => prev.map((todo) => (todo.id === id ? updatedTodo : todo)));
       setAnimatingTodos((prev) => ({ ...prev, [id]: false }));
     }, 300);
   };
@@ -48,8 +58,10 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
     });
   };
 
-  const handleBatchDelete = () => {
-    selectedTodos.forEach((id) => deleteTodo(id));
+  const handleBatchDelete = async () => {
+    const idsToDelete = Array.from(selectedTodos);
+    await Promise.all(idsToDelete.map((id) => todoService.deleteTodo(id)));
+    setTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
     setSelectedTodos(new Set());
     toast.success("Tasks deleted successfully!", {
       position: "bottom-right",
@@ -57,9 +69,9 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
     });
   };
 
-  const handleReorder = (newOrder: Task[]) => {
+  const handleReorder = async (newOrder: Task[]) => {
     setOrderedTodos(newOrder);
-    reorderTodos(newOrder);
+    await Promise.all(newOrder.map((todo, index) => todoService.updateTodo(todo.id, { order: index })));
   };
 
   if (todos.length === 0) {

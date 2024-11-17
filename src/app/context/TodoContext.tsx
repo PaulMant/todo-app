@@ -1,63 +1,21 @@
 "use client";
 
-import { Task } from "../models/Task";
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
+import { TodoService } from "../models/TodoService";
+import { LocalStorageTodoService } from "../services/LocalStorageTodoService";
 
-const LOCAL_STORAGE_KEY = "todos";
+const TodoServiceContext = createContext<TodoService | undefined>(undefined);
 
-type TodoContextType = {
-  todos: Task[];
-  addTodo: (task: string) => void;
-  toggleTodo: (id: number) => void;
-  deleteTodo: (id: number) => void;
-  deleteAllTodos: () => void;
-  reorderTodos: (newOrder: Task[]) => void;
+export const TodoServiceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [todoService] = useState<TodoService>(new LocalStorageTodoService());
+
+  return <TodoServiceContext.Provider value={todoService}>{children}</TodoServiceContext.Provider>;
 };
 
-const TodoContext = createContext<TodoContextType | undefined>(undefined);
-
-export const TodoProvider = ({ children }: { children: ReactNode }) => {
-  const [todos, setTodos] = useState<Task[]>([]);
-  useEffect(() => {
-    const storedTodos = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedTodos) {
-      setTodos(JSON.parse(storedTodos));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos));
-  }, [todos]);
-
-  const addTodo = (task: string) => {
-    setTodos((prev) => [{ id: Date.now(), task, completed: false }, ...prev]);
-  };
-
-  const toggleTodo = (id: number) => {
-    setTodos((prev) => prev.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)));
-  };
-
-  const deleteTodo = (id: number) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  };
-
-  const deleteAllTodos = () => {
-    setTodos([]);
-  };
-
-  const reorderTodos = (newOrder: Task[]) => {
-    setTodos(newOrder);
-  };
-
-  return (
-    <TodoContext.Provider value={{ todos, addTodo, toggleTodo, deleteTodo, deleteAllTodos, reorderTodos }}>{children}</TodoContext.Provider>
-  );
-};
-
-export const useTodoContext = (): TodoContextType => {
-  const context = useContext(TodoContext);
+export const useTodoService = (): TodoService => {
+  const context = useContext(TodoServiceContext);
   if (!context) {
-    throw new Error("useTodoContext must be used within a TodoProvider");
+    throw new Error("useTodoService must be used within a TodoServiceProvider");
   }
   return context;
 };
