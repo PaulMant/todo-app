@@ -33,7 +33,7 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
   useEffect(() => {
     if (todos.length > orderedTodos.length) {
       const newTasks = todos.filter((todo) => !orderedTodos.some((orderedTodo) => orderedTodo.id === todo.id));
-      setOrderedTodos((prev) => [...prev, ...newTasks]);
+      setOrderedTodos((prev) => [...newTasks, ...prev]);
     }
   }, [todos, orderedTodos]);
 
