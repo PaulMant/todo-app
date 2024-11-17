@@ -5,13 +5,17 @@ This application is a task management tool built with a modern web stack, enabli
 ## Tech Stack
 
 Frontend Framework: React with TypeScript
+
 State Management: React Context API
+
 Forms: React Hook Form with Shadcn for form styling
+
 Styling: Tailwind CSS
-Icons: Radix UI Icons
+
 Validation: Zod schema for runtime validation
-Persistence Layer: LocalStorage (via LocalStorageTodoService)
-Key Features
+
+## Key Features
+
 Task Management: Add and persist tasks in local storage.
 Form Validation: Input validation powered by React Hook Form and Zod.
 Responsive Design: Fully responsive interface styled with Tailwind CSS.
@@ -22,33 +26,32 @@ Application Structure
 
 ### Core Modules
 
-Todo Service
 Interface: TodoService
 
-`````export interface TodoService {
-  addTodo(task: string): Promise<void>;
-  getTodos(): Promise<Todo[]>;
-  deleteTodo(id: string): Promise<void>;
-}```
+`export interface TodoService {
+addTodo(task: string): Promise<void>;
+getTodos(): Promise<Todo[]>;
+deleteTodo(id: string): Promise<void>;
+}`
+
 Implementation: LocalStorageTodoService
 
-```export class LocalStorageTodoService implements TodoService {
+`export class LocalStorageTodoService implements TodoService {
   addTodo(task: string): Promise<void> { ... }
   getTodos(): Promise<Todo[]> { ... }
   deleteTodo(id: string): Promise<void> { ... }
-}````
+}`
 
 Context
 TodoServiceContext provides the TodoService implementation to the app.
 Example usage:
-```const { addTodo } = useTodoService();````
-
+`const { addTodo } = useTodoService();`
 
 Forms
 Built with React Hook Form and integrated with Shadcn components for enhanced styling and functionality.
 Example schema:
 
-```import * as z from "zod";
+````import * as z from "zod";
 
 export const taskSchema = z.object({
   task: z.string().min(1, "Task cannot be empty"),
@@ -65,7 +68,5 @@ To replace the storage system:
 Due to Dependency Injection, implementing the TodoService interface with the new storage system is very easy.
 Update the TodoServiceProvider in TodoContext.tsx:
 
+`const [todoService] = useState<TodoService>(new NewStorageTodoService());`
 ````
-const [todoService] = useState<TodoService>(new NewStorageTodoService());```
-````
-`````
