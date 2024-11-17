@@ -11,6 +11,7 @@ export class LocalStorageTodoService implements TodoService {
     this.getTodos = this.getTodos.bind(this);
     this.addTodo = this.addTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
+    this.deleteTodos = this.deleteTodos.bind(this);
     this.deleteAllTodos = this.deleteAllTodos.bind(this);
     this.updateTodo = this.updateTodo.bind(this);
     this.subscribe = this.subscribe.bind(this);
@@ -47,6 +48,13 @@ export class LocalStorageTodoService implements TodoService {
   async deleteTodo(id: number): Promise<void> {
     const todos = await this.getTodos();
     const updatedTodos = todos.filter((todo) => todo.id !== id);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedTodos));
+    await this.notifySubscribers();
+  }
+
+  async deleteTodos(ids: number[]): Promise<void> {
+    const todos = await this.getTodos();
+    const updatedTodos = todos.filter((todo) => !ids.includes(todo.id));
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedTodos));
     await this.notifySubscribers();
   }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BatchActions from "./BatchActions";
@@ -44,15 +44,18 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
       return a.completed ? 1 : -1;
     });
 
-  const handleToggle = async (id: number) => {
-    setAnimatingTodos((prev) => ({ ...prev, [id]: true }));
-    setTimeout(async () => {
-      const updatedTodo = await todoService.updateTodo(id, { completed: !todos.find((todo) => todo.id === id)?.completed });
+  const handleToggle = useCallback(
+    async (id: number) => {
+      setAnimatingTodos((prev) => ({ ...prev, [id]: true }));
+      const updatedTodo = await todoService.updateTodo(id, {
+        completed: !todos.find((todo) => todo.id === id)?.completed,
+      });
       setTodos((prev) => prev.map((todo) => (todo.id === id ? updatedTodo : todo)));
       setOrderedTodos((prev) => prev.map((todo) => (todo.id === id ? updatedTodo : todo)));
       setAnimatingTodos((prev) => ({ ...prev, [id]: false }));
-    }, 300);
-  };
+    },
+    [todos, todoService]
+  );
 
   const handleSelect = (id: number, checked: boolean) => {
     setSelectedTodos((prev) => {
@@ -74,9 +77,7 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
   const handleBatchDelete = async () => {
     try {
       const idsToDelete = Array.from(selectedTodos);
-      for (const id of idsToDelete) {
-        await todoService.deleteTodo(id);
-      }
+      await todoService.deleteTodos(idsToDelete);
       setTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
       setOrderedTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
       setSelectedTodos(new Set());
@@ -85,7 +86,8 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
         autoClose: 3500,
       });
     } catch (error) {
-      toast.error(`Error deleting tasks. Please try again. ${error}`, {
+      console.error("Error deleting tasks:", error);
+      toast.error("Error deleting tasks. Please try again", {
         position: "bottom-right",
         autoClose: 3500,
       });
