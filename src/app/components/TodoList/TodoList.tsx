@@ -20,15 +20,21 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
   const [orderedTodos, setOrderedTodos] = useState<Task[]>([]);
 
   useEffect(() => {
-    todoService.getTodos().then(setTodos);
+    todoService.getTodos().then((fetchedTodos) => {
+      setTodos(fetchedTodos);
+      setOrderedTodos(fetchedTodos);
+    });
     const unsubscribe = todoService.subscribe(setTodos);
 
     return () => unsubscribe();
   }, [todoService]);
 
   useEffect(() => {
-    setOrderedTodos(todos);
-  }, [todos]);
+    if (todos.length > orderedTodos.length) {
+      const newTasks = todos.filter((todo) => !orderedTodos.some((orderedTodo) => orderedTodo.id === todo.id));
+      setOrderedTodos((prev) => [...prev, ...newTasks]);
+    }
+  }, [todos, orderedTodos]);
 
   const filteredTodos = orderedTodos
     .filter((todo) => todo.task.toLowerCase().includes(search.toLowerCase()))
@@ -59,19 +65,29 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
   };
 
   const handleBatchDelete = async () => {
-    const idsToDelete = Array.from(selectedTodos);
-    await Promise.all(idsToDelete.map((id) => todoService.deleteTodo(id)));
-    setTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
-    setSelectedTodos(new Set());
-    toast.success("Tasks deleted successfully!", {
-      position: "bottom-right",
-      autoClose: 3500,
-    });
+    try {
+      const idsToDelete = Array.from(selectedTodos);
+      for (const id of idsToDelete) {
+        await todoService.deleteTodo(id);
+      }
+      setTodos((prev) => prev.filter((todo) => !selectedTodos.has(todo.id)));
+      setSelectedTodos(new Set());
+      toast.success(`${idsToDelete.length} tasks deleted successfully!`, {
+        position: "bottom-right",
+        autoClose: 3500,
+      });
+    } catch (error) {
+      toast.error(`Error deleting tasks. Please try again. ${error}`, {
+        position: "bottom-right",
+        autoClose: 3500,
+      });
+    }
   };
 
   const handleReorder = async (newOrder: Task[]) => {
     setOrderedTodos(newOrder);
     await Promise.all(newOrder.map((todo, index) => todoService.updateTodo(todo.id, { order: index })));
+    localStorage.setItem("todos", JSON.stringify(newOrder));
   };
 
   if (todos.length === 0) {

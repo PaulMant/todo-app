@@ -61,8 +61,8 @@ const DragAndDropList: React.FC<DragAndDropListProps> = ({
                     className={`flex w-full h-14 rounded-lg items-center px-4 border transition-all duration-300 ${
                       todo.completed ? "text-gray-500" : ""
                     }
-                    ${animatingTodos[todo.id] ? "translate-y-2 opacity-50" : ""} 
-                    ${selectedTodos.has(todo.id) ? "border-seedext" : "border-gray-300"} hover:shadow-lg`}>
+                      ${animatingTodos[todo.id] ? "translate-y-2 opacity-50" : ""} 
+                      ${selectedTodos.has(todo.id) ? "border-seedext" : "border-gray-300"} hover:shadow-lg`}>
                     <TodoItem todo={todo} onToggle={() => onToggle(todo.id)} />
                   </li>
                 </SortableItem>

@@ -8,7 +8,6 @@ export class LocalStorageTodoService implements TodoService {
   private subscribers: ((todos: Task[]) => void)[] = [];
 
   constructor() {
-    // Bind all methods to preserve 'this' context
     this.getTodos = this.getTodos.bind(this);
     this.addTodo = this.addTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
@@ -24,7 +23,6 @@ export class LocalStorageTodoService implements TodoService {
 
   subscribe(callback: (todos: Task[]) => void): () => void {
     this.subscribers.push(callback);
-    // Return unsubscribe function
     return () => {
       this.subscribers = this.subscribers.filter((cb) => cb !== callback);
     };
