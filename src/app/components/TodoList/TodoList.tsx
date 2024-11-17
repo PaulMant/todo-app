@@ -53,6 +53,7 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
   };
 
   const handleSelect = (id: number, checked: boolean) => {
+    console.log(id, checked);
     setSelectedTodos((prev) => {
       const updated = new Set(prev);
       if (checked) {
