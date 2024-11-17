@@ -27,13 +27,12 @@ Validation: Zod schema for runtime validation
 
 ## Key Features
 
-- Task Management: Add and persist tasks in local storage.
+- Task Management: Add and persist tasks in local storage. Create and re-order tasks, batch-delete, and mark them as done !
 - Form Validation: Input validation powered by React Hook Form and Zod.
 - Responsive Design: Fully responsive interface styled with Tailwind CSS.
 - Decoupled Persistence Layer: Use of TodoService interface for data operations, enabling easy extension or replacement of the data source.
 - Context-Based Architecture: Centralized state management using TodoServiceContext.
 - Error-Free TypeScript Implementation: Fully typed components and services.
--
 
 ## Application Structure
 
