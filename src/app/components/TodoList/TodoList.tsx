@@ -1,19 +1,16 @@
-import { ConfirmDeleteDialog } from "../../dialogs/ConfirmDelete";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useTodoContext } from "../../context/TodoContext";
+import { ConfirmDeleteDialog } from "../../dialogs/ConfirmDelete";
 import { Button } from "../ui/button";
 import DeleteAllButton from "./DeleteAllButton";
 import TodoItem from "./TodoItem";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
+import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { SortableItem } from "./SortableItem";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { RotateCcw } from "lucide-react";
-import { CircleCheckBig } from "lucide-react";
-import { Trash2 } from "lucide-react";
 
 interface TodoListProps {
   search: string;
@@ -84,16 +81,6 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
     });
   };
 
-  const handleDelete = (id: number) => {
-    setTimeout(() => {
-      deleteTodo(id);
-      toast.success("Task deleted successfully!", {
-        position: "bottom-right",
-        autoClose: 2800,
-      });
-    }, 700);
-  };
-
   if (todos.length === 0) {
     return (
       <div>
@@ -130,56 +117,29 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
         <ul className="space-y-4 w-full max-h-[45vh] overflow-y-auto">
-          {filteredTodos.map((todo) => (
-            <div key={todo.id} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectedTodos.has(todo.id)}
-                onChange={(e) => handleSelect(todo.id, e.target.checked)}
-                className="mr-4"
-              />
-
-              <li
-                className={`flex w-full h-14 justify-start rounded-lg items-center px-4 border transition-all ${
-                  todo.completed ? "text-gray-500" : ""
-                } ${animatingTodos[todo.id] ? "translate-y-4 opacity-50 duration-300" : "hover:shadow-lg"}`}>
-                {todo.completed ? (
-                  <TodoItem todo={todo} />
-                ) : (
-                  <div className="w-full">
-                    <SortableContext items={filteredTodos.map((todo) => todo.id)} strategy={verticalListSortingStrategy}>
-                      <SortableItem key={todo.id} id={todo.id}>
-                        <TodoItem todo={todo} />
-                      </SortableItem>
-                    </SortableContext>
-                  </div>
-                )}
-                <div className="flex gap-2 w-24">
-                  <Button
-                    onClick={() => handleToggle(todo.id)}
-                    variant={todo.completed ? "outline" : "ghost"}
-                    className="hover:scale-110 transition-transform bg-transparent border-none"
-                    title={todo.completed ? "Mark as incomplete" : "Mark as complete"}>
-                    {todo.completed ? (
-                      <RotateCcw className="size-4 bg-transparent text-seedext" />
-                    ) : (
-                      <CircleCheckBig className="size-4 text-seedext" />
-                    )}
-                  </Button>
-                  <ConfirmDeleteDialog
-                    buttonText={
-                      <Button variant="ghost" className="hover:scale-110 transition-transform" title="Delete task">
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
-                    }
-                    title="Are you 100% sure?"
-                    description={`This action will permanently delete ${todo.task}.`}
-                    onDelete={() => handleDelete(todo.id)}
-                  />
+          <SortableContext items={filteredTodos.map((todo) => todo.id)} strategy={verticalListSortingStrategy}>
+            {filteredTodos.map((todo) => (
+              <div className="flex items-center w-full" key={todo.id}>
+                <input
+                  type="checkbox"
+                  checked={selectedTodos.has(todo.id)}
+                  onChange={(e) => handleSelect(todo.id, e.target.checked)}
+                  className="mr-4"
+                />
+                <div className="w-full">
+                  <SortableItem key={todo.id} id={todo.id}>
+                    <li
+                      className={`flex w-full h-14 rounded-lg items-center px-4 border transition-all duration-300 ${
+                        todo.completed ? "text-gray-500" : ""
+                      }
+                      ${animatingTodos[todo.id] ? "translate-y-2 opacity-50" : ""} hover:shadow-lg`}>
+                      <TodoItem todo={todo} onToggle={() => handleToggle(todo.id)} />
+                    </li>
+                  </SortableItem>
                 </div>
-              </li>
-            </div>
-          ))}
+              </div>
+            ))}
+          </SortableContext>
         </ul>
       </DndContext>
     </div>
