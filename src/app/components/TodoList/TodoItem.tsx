@@ -11,9 +11,10 @@ import { Button } from "../ui/button";
 interface TodoItemProps {
   todo: Task;
   onToggle: () => void;
+  onDelete: () => void;
 }
 
-export default function TodoItem({ todo, onToggle }: TodoItemProps) {
+export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const todoService = useTodoService();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -21,6 +22,7 @@ export default function TodoItem({ todo, onToggle }: TodoItemProps) {
     setIsDeleting(true);
     setTimeout(() => {
       todoService.deleteTodo(todo.id);
+      onDelete();
       toast.success("Task deleted successfully!", {
         position: "bottom-right",
         autoClose: 2800,

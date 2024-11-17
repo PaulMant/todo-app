@@ -64,6 +64,11 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
     });
   };
 
+  const handleDelete = (id: number) => {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    setOrderedTodos((prev) => prev.filter((todo) => todo.id !== id));
+  };
+
   const handleBatchDelete = async () => {
     try {
       const idsToDelete = Array.from(selectedTodos);
@@ -108,6 +113,7 @@ const TodoList: React.FC<TodoListProps> = ({ search }) => {
         animatingTodos={animatingTodos}
         selectedTodos={selectedTodos}
         onToggle={handleToggle}
+        onDelete={handleDelete}
         onSelect={handleSelect}
         onReorder={handleReorder}
       />
